@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>療程結算系統</title>
+<style>
+:root {
+  --blue:    #1b3a6b;
+  --blue2:   #2e5fa3;
+  --green:   #2e6b2e;
+  --amber:   #f5a623;
+  --red:     #c62828;
+  --bg:      #f0f2f5;
+  --white:   #ffffff;
+  --border:  #e0e0e0;
+  --text:    #222222;
+  --muted:   #888888;
+  --input-bg:#fff8e7;
+  --res-bg:  #eaf4ea;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:12px}
+
+/* ── 標題 ── */
+.app-title{
+  background:var(--blue);color:#fff;
+  text-align:center;font-size:1.2rem;font-weight:700;letter-spacing:.15em;
+  padding:14px 16px;border-radius:12px;margin-bottom:12px;
+}
+
+/* ── 卡片 ── */
+.card{background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px}
+.card-head{padding:10px 14px;font-size:.82rem;font-weight:700;letter-spacing:.05em;color:#fff}
+.card-head.blue{background:var(--blue2)}
+.card-head.green{background:var(--green)}
+
+/* ── 欄位行 ── */
+.field{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #f5f5f5;gap:10px;min-height:54px}
+.field:last-child{border-bottom:none}
+.field.sub{background:#fafafa;min-height:46px}
+.field-info{flex:1;min-width:0}
+.field-label{font-size:.95rem;font-weight:500;line-height:1.3}
+.field-hint{font-size:.72rem;color:var(--muted);margin-top:2px;line-height:1.3}
+.field-sep{height:4px;background:#f0f0f0;border-top:2px solid var(--border)}
+
+/* ── 輸入控件 ── */
+input[type=number],select{
+  width:120px;padding:8px 10px;
+  font-family:inherit;font-size:1rem;font-weight:700;color:#bf5000;
+  background:var(--input-bg);border:1.5px solid var(--amber);border-radius:8px;
+  text-align:right;outline:none;transition:border-color .15s;flex-shrink:0;
+  -moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+input[type=number]:focus,select:focus{border-color:#bf5000;background:#fff3d0}
+select{text-align:center;cursor:pointer;padding:8px 4px}
+
+/* ── 桌面雙欄 ── */
+@media(min-width:700px){
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  .two-col > *{margin-bottom:0}
+  .full-width{grid-column:1/-1}
+}
+
+/* ── 結果區 ── */
+.result-row{display:flex;align-items:flex-start;padding:10px 14px;border-bottom:1px solid #f0f0f0;background:var(--res-bg);gap:10px;min-height:48px}
+.result-row:last-child{border-bottom:none}
+.result-lbl{flex:1;font-size:.9rem;color:#444;line-height:1.3}
+.result-sub{font-size:.72rem;color:var(--muted);margin-top:2px}
+.result-val{font-size:1rem;font-weight:700;color:#1a5c1a;white-space:nowrap;padding-top:1px}
+.result-val.dim{color:#bbb;font-weight:400;font-size:.85rem}
+
+/* ── 應收大框 ── */
+.total-box{background:var(--white);border-radius:12px;padding:20px 16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px}
+.total-lbl{font-size:.82rem;color:var(--muted);margin-bottom:6px}
+.total-amt{font-size:3rem;font-weight:700;color:var(--red);line-height:1;margin-bottom:14px}
+.total-amt.paid{color:var(--green)}
+.status-pill{display:inline-block;padding:9px 20px;border-radius:20px;font-size:.9rem;font-weight:700}
+.status-pill.ok{background:#e8f5e9;color:var(--green)}
+.status-pill.ng{background:#ffebee;color:var(--red)}
+
+/* ── 說明 ── */
+.note{font-size:.72rem;color:#aaa;text-align:center;padding:4px 0 8px}
+</style>
+</head>
+<body>
+
+<div class="app-title">療 程 結 算 系 統</div>
+
+<div class="two-col">
+
+  <!-- 左欄 -->
+  <div>
+    <div class="card">
+      <div class="card-head blue">① 定價設定</div>
+      <div class="field">
+        <div class="field-info">
+          <div class="field-label">舊療程定價</div>
+          <div class="field-hint">此客戶原本的定價，無則填 0</div>
+        </div>
+        <input type="number" id="oldPrice" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
+      </div>
+      <div class="field">
+        <div class="field-info">
+          <div class="field-label">新療程定價</div>
+          <div class="field-hint">本次療程現行定價</div>
+        </div>
+        <input type="number" id="newPrice" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head blue">② 舊卡 ／ 現場付款</div>
+      <div class="field">
+        <div class="field-info">
+          <div class="field-label">舊卡殘額</div>
+          <div class="field-hint">舊療程卡剩餘金額，無則填 0</div>
+        </div>
+        <input type="number" id="oldCard" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
+      </div>
+      <div class="field">
+        <div class="field-info">
+          <div class="field-label">現場已付（現金／刷卡）</div>
+          <div class="field-hint">客戶今天額外付的金額</div>
+        </div>
+        <input type="number" id="cashPaid" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- 右欄 -->
+  <div>
+    <div class="card">
+      <div class="card-head blue">③ 新卡設定</div>
+
+      <!-- 新卡① -->
+      <div class="field">
+        <div class="field-info">
+          <div class="field-label">新卡①　<b>8折</b>　面額 20萬</div>
+          <div class="field-hint">殘額</div>
+        </div>
+        <input type="number" id="bal1" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
+      </div>
+      <div class="field sub">
+        <div class="field-info">
+          <div class="field-label" style="color:var(--muted);font-size:.85rem">新卡① 扣款順序</div>
+        </div>
+        <select id="order1" onchange="calc()">
+          <option value="1">第 1 扣</option>
+          <option value="2">第 2 扣</option>
+          <option value="3">第 3 扣</option>
+          <option value="9">不使用</option>
+        </select>
+      </div>
+      <div class="field-sep"></div>
+
+      <!-- 新卡② -->
+      <div class="field">
+        <div class="field-info">
+          <div class="field-label">新卡②　<b>75折</b>　面額 20萬</div>
+          <div class="field-hint">殘額</div>
+        </div>
+        <input type="number" id="bal2" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
+      </div>
+      <div class="field sub">
+        <div class="field-info">
+          <div class="field-label" style="color:var(--muted);font-size:.85rem">新卡② 扣款順序</div>
+        </div>
+        <select id="order2" onchange="calc()">
+          <option value="1">第 1 扣</option>
+          <option value="2" selected>第 2 扣</option>
+          <option value="3">第 3 扣</option>
+          <option value="9">不使用</option>
+        </select>
+      </div>
+      <div class="field-sep"></div>
+
+      <!-- 新卡③ -->
+      <div class="field">
+        <div class="field-info">
+          <div class="field-label">新卡③　<b>75折</b>　面額 30萬</div>
+          <div class="field-hint">殘額</div>
+        </div>
+        <input type="number" id="bal3" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
+      </div>
+      <div class="field sub">
+        <div class="field-info">
+          <div class="field-label" style="color:var(--muted);font-size:.85rem">新卡③ 扣款順序</div>
+        </div>
+        <select id="order3" onchange="calc()">
+          <option value="1">第 1 扣</option>
+          <option value="2">第 2 扣</option>
+          <option value="3" selected>第 3 扣</option>
+          <option value="9">不使用</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 結算明細（全寬） -->
+  <div class="card full-width">
+    <div class="card-head green">④ 結算明細</div>
+    <div id="breakdown"></div>
+  </div>
+
+</div><!-- /two-col -->
+
+<!-- 應收總額 -->
+<div class="total-box">
+  <div class="total-lbl">現場應收金額</div>
+  <div class="total-amt" id="totalAmt">$0</div>
+  <div><span class="status-pill ok" id="statusPill">請輸入定價開始結算</span></div>
+</div>
+
+<div class="note">黃底格 = 手動輸入 ｜ 計算結果即時更新</div>
+
+<script>
+const $=id=>document.getElementById(id)
+const money=n=>'$'+Math.round(n).toLocaleString('zh-TW')
+const pct=n=>(n*100).toFixed(1)+'%'
+
+function calc(){
+  // 讀取輸入
+  const oldP  = +$('oldPrice').value||0
+  const newP  = +$('newPrice').value||0
+  const oldC  = +$('oldCard').value||0
+  const cash  = +$('cashPaid').value||0
+  const bal   = [+$('bal1').value||0, +$('bal2').value||0, +$('bal3').value||0]
+  const disc  = [0.8, 0.75, 0.75]
+  const order = [+$('order1').value, +$('order2').value, +$('order3').value]
+  const names = ['新卡①（8折）','新卡②（75折）','新卡③（75折）']
+  const discLabel = ['8折','75折','75折']
+
+  // ── 核心計算（對應 Excel H61-H79）──
+  // H61: 舊卡實扣面額
+  const H61 = oldP>0 ? Math.min(oldC, oldP) : 0
+  // H62: 舊卡已付比例
+  const H62 = oldP>0 ? H61/oldP : 0
+  // H63: 剩餘比例
+  const H63 = 1-H62
+  // H64: 有無新卡
+  const H64 = bal.some((b,i)=>b>0&&order[i]!==9) ? 1 : 0
+  // H65: 新卡基準面額（ROUND）
+  let H65
+  if(oldC===0) H65 = newP
+  else if(H64===1) H65 = Math.round(H63*newP)
+  else H65 = Math.round(H63*oldP)
+
+  // 各卡面額上限
+  const ceil = bal.map((b,i)=>order[i]===9?0:(disc[i]>0?b/disc[i]:0))
+  // H66/H67/H68
+  const H66=ceil[0], H67=ceil[1], H68=ceil[2]
+
+  // rank 扣款
+  function rankCeil(r){ return order[0]===r?H66:order[1]===r?H67:order[2]===r?H68:0 }
+  const H69=rankCeil(1)
+  const H70=Math.min(H69, Math.max(H65,0))
+  const H71=Math.max(H65-H70,0)
+  const H72=rankCeil(2)
+  const H73=Math.min(H72,H71)
+  const H74=Math.max(H71-H73,0)
+  const H75=rankCeil(3)
+  const H76=Math.min(H75,H74)
+
+  // 各卡面額扣除
+  function cardFace(i){
+    if(order[i]===9) return 0
+    if(order[i]===1) return H70
+    if(order[i]===2) return H73
+    if(order[i]===3) return H76
+    return 0
+  }
+  const face=[cardFace(0),cardFace(1),cardFace(2)]
+  const actual=face.map((f,i)=>f*disc[i])
+
+  // 現場應收（對應 B27）
+  const due = Math.max(Math.round(H65-face[0]-face[1]-face[2])-cash, 0)
+
+  // ── 建明細 ──
+  const rows=[]
+
+  if(oldP>0||newP>0){
+    const track = oldC===0 ? '新定價' : H64===1 ? '舊卡剩餘比例 × 新定價' : '舊卡剩餘比例 × 舊定價'
+    rows.push({lbl:'應付基準金額', sub:track, val:money(H65), dim:false})
+  }
+
+  if(oldP>0){
+    if(H61>0)
+      rows.push({lbl:`舊卡抵扣（已付 ${pct(H62)}）`, sub:'', val:`-${money(H61)}`, dim:false})
+    else
+      rows.push({lbl:'舊卡抵扣', sub:'殘額為 0，未使用', val:'—', dim:true})
+  }
+
+  face.forEach((f,i)=>{
+    if(order[i]===9) return
+    if(bal[i]===0) return
+    if(f>0)
+      rows.push({lbl:`${names[i]} 扣除`, sub:`面額 ${money(f)} × ${discLabel[i]}`, val:`-${money(actual[i])}`, dim:false})
+    else
+      rows.push({lbl:names[i], sub:'前面卡已扣完，未觸及', val:'—', dim:true})
+  })
+
+  if(cash>0)
+    rows.push({lbl:'現場已付', sub:'現金或刷卡', val:`-${money(cash)}`, dim:false})
+
+  $('breakdown').innerHTML = rows.length
+    ? rows.map(r=>`
+      <div class="result-row">
+        <div class="result-lbl">${r.lbl}${r.sub?`<div class="result-sub">${r.sub}</div>`:''}</div>
+        <div class="result-val${r.dim?' dim':''}">${r.val}</div>
+      </div>`).join('')
+    : '<div class="result-row"><div class="result-lbl" style="color:#bbb">輸入定價後即顯示明細</div></div>'
+
+  // ── 總額與狀態 ──
+  const ta=$('totalAmt'), sp=$('statusPill')
+  ta.textContent = money(due)
+  if(!newP&&!oldP){
+    ta.className='total-amt'; sp.className='status-pill ok'; sp.textContent='請輸入定價開始結算'
+  } else if(due<=0){
+    ta.className='total-amt paid'; sp.className='status-pill ok'; sp.textContent='✓ 已全額付清，不需補款'
+  } else {
+    ta.className='total-amt'; sp.className='status-pill ng'; sp.textContent='❌ 請向客戶收取上方金額'
+  }
+}
+
+calc()
+</script>
+</body>
+</html>
