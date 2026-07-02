@@ -2,41 +2,38 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1b3a6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="療程結算">
 <title>療程結算系統</title>
 <style>
 :root {
-  --blue:    #1b3a6b;
-  --blue2:   #2e5fa3;
-  --green:   #2e6b2e;
-  --amber:   #f5a623;
-  --red:     #c62828;
-  --bg:      #f0f2f5;
-  --white:   #ffffff;
-  --border:  #e0e0e0;
-  --text:    #222222;
-  --muted:   #888888;
-  --input-bg:#fff8e7;
-  --res-bg:  #eaf4ea;
+  --blue:#1b3a6b; --blue2:#2e5fa3; --green:#2e6b2e;
+  --amber:#f5a623; --red:#c62828; --bg:#f0f2f5;
+  --white:#fff; --border:#e0e0e0; --text:#222;
+  --muted:#888; --input-bg:#fff8e7; --res-bg:#eaf4ea;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{font-size:16px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:12px;padding-bottom:70px}
 
-/* ── 標題 ── */
-.app-title{
-  background:var(--blue);color:#fff;
-  text-align:center;font-size:1.2rem;font-weight:700;letter-spacing:.15em;
-  padding:14px 16px;border-radius:12px;margin-bottom:12px;
-}
+.app-title{background:var(--blue);color:#fff;text-align:center;font-size:1.15rem;font-weight:700;letter-spacing:.12em;padding:14px 16px;border-radius:12px;margin-bottom:12px}
 
-/* ── 卡片 ── */
+/* ── 頁籤 ── */
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{flex:1;text-align:center;padding:10px;background:var(--white);border-radius:10px;font-size:.9rem;font-weight:500;color:var(--muted);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06);border:2px solid transparent}
+.tab.active{color:var(--blue2);border-color:var(--blue2);font-weight:700}
+.page{display:none}
+.page.active{display:block}
+
 .card{background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px}
-.card-head{padding:10px 14px;font-size:.82rem;font-weight:700;letter-spacing:.05em;color:#fff}
+.card-head{padding:10px 14px;font-size:.82rem;font-weight:700;letter-spacing:.05em;color:#fff;display:flex;justify-content:space-between;align-items:center}
 .card-head.blue{background:var(--blue2)}
 .card-head.green{background:var(--green)}
+.card-head.gray{background:#607d8b}
 
-/* ── 欄位行 ── */
 .field{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #f5f5f5;gap:10px;min-height:54px}
 .field:last-child{border-bottom:none}
 .field.sub{background:#fafafa;min-height:46px}
@@ -45,27 +42,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC','Helvetica Neue
 .field-hint{font-size:.72rem;color:var(--muted);margin-top:2px;line-height:1.3}
 .field-sep{height:4px;background:#f0f0f0;border-top:2px solid var(--border)}
 
-/* ── 輸入控件 ── */
-input[type=number],select{
-  width:120px;padding:8px 10px;
-  font-family:inherit;font-size:1rem;font-weight:700;color:#bf5000;
+input[type=number],input[type=text],select{
+  padding:8px 10px;font-family:inherit;font-size:1rem;font-weight:700;color:#bf5000;
   background:var(--input-bg);border:1.5px solid var(--amber);border-radius:8px;
-  text-align:right;outline:none;transition:border-color .15s;flex-shrink:0;
-  -moz-appearance:textfield;
+  outline:none;flex-shrink:0;-moz-appearance:textfield;
 }
+input[type=number]{width:120px;text-align:right}
+input[type=text]{width:150px;text-align:left;font-weight:500}
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
-input[type=number]:focus,select:focus{border-color:#bf5000;background:#fff3d0}
-select{text-align:center;cursor:pointer;padding:8px 4px}
+input:focus,select:focus{border-color:#bf5000;background:#fff3d0}
+select{text-align:center;cursor:pointer;padding:8px 4px;width:110px}
+select.dup{border-color:var(--red);background:#ffebee;color:var(--red)}
 
-/* ── 桌面雙欄 ── */
 @media(min-width:700px){
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
   .two-col > *{margin-bottom:0}
   .full-width{grid-column:1/-1}
 }
 
-/* ── 結果區 ── */
+.warn-bar{display:none;background:#fff3e0;color:#e65100;font-size:.82rem;font-weight:500;padding:10px 14px;border-radius:10px;margin-bottom:12px;border:1px solid #ffcc80}
+.warn-bar.show{display:block}
+
 .result-row{display:flex;align-items:flex-start;padding:10px 14px;border-bottom:1px solid #f0f0f0;background:var(--res-bg);gap:10px;min-height:48px}
 .result-row:last-child{border-bottom:none}
 .result-lbl{flex:1;font-size:.9rem;color:#444;line-height:1.3}
@@ -73,7 +71,6 @@ select{text-align:center;cursor:pointer;padding:8px 4px}
 .result-val{font-size:1rem;font-weight:700;color:#1a5c1a;white-space:nowrap;padding-top:1px}
 .result-val.dim{color:#bbb;font-weight:400;font-size:.85rem}
 
-/* ── 應收大框 ── */
 .total-box{background:var(--white);border-radius:12px;padding:20px 16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px}
 .total-lbl{font-size:.82rem;color:var(--muted);margin-bottom:6px}
 .total-amt{font-size:3rem;font-weight:700;color:var(--red);line-height:1;margin-bottom:14px}
@@ -82,20 +79,64 @@ select{text-align:center;cursor:pointer;padding:8px 4px}
 .status-pill.ok{background:#e8f5e9;color:var(--green)}
 .status-pill.ng{background:#ffebee;color:var(--red)}
 
-/* ── 說明 ── */
+.btn{display:inline-block;border:none;font-family:inherit;font-size:.85rem;font-weight:500;padding:10px 20px;border-radius:10px;cursor:pointer;margin:4px}
+.btn.primary{background:var(--blue2);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.gray{background:#eceff1;color:#546e7a}
+.btn.red{background:#ffebee;color:var(--red)}
+.btn:active{opacity:.8}
+.btn.small{padding:6px 12px;font-size:.75rem;margin:0}
+
+/* ── 紀錄頁 ── */
+.record{background:var(--white);border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.record-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.record-name{font-size:1rem;font-weight:700}
+.record-time{font-size:.72rem;color:var(--muted)}
+.record-due{font-size:1.1rem;font-weight:700}
+.record-due.paid{color:var(--green)}
+.record-due.owe{color:var(--red)}
+.record-detail{font-size:.78rem;color:#666;line-height:1.6;white-space:pre-line;border-top:1px dashed #e0e0e0;margin-top:8px;padding-top:8px;display:none}
+.record.open .record-detail{display:block}
+.record-actions{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
+.empty-msg{text-align:center;color:#bbb;padding:40px 20px;font-size:.9rem}
+
+/* ── 卡片管理頁 ── */
+.cardmgr-item{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #f5f5f5;flex-wrap:wrap}
+.cardmgr-item input[type=text]{width:110px;font-size:.85rem}
+.cardmgr-item input[type=number]{width:80px;font-size:.85rem}
+.cardmgr-lbl{font-size:.68rem;color:var(--muted);display:block;margin-bottom:2px}
+.mgr-hint{font-size:.75rem;color:var(--muted);padding:10px 14px;background:#fafafa;line-height:1.5}
+
 .note{font-size:.72rem;color:#aaa;text-align:center;padding:4px 0 8px}
+.ver{font-size:.65rem;color:#ccc;text-align:center;padding-bottom:8px}
 </style>
 </head>
 <body>
 
 <div class="app-title">療 程 結 算 系 統</div>
 
-<div class="two-col">
+<div class="tabs">
+  <div class="tab active" onclick="showPage('calc')" id="tab-calc">💰 結算</div>
+  <div class="tab" onclick="showPage('records')" id="tab-records">📋 紀錄</div>
+  <div class="tab" onclick="showPage('settings')" id="tab-settings">⚙️ 卡片管理</div>
+</div>
 
-  <!-- 左欄 -->
+<!-- ═══════════ 結算頁 ═══════════ -->
+<div class="page active" id="page-calc">
+
+<div class="warn-bar" id="warnBar"></div>
+
+<div class="two-col">
   <div>
     <div class="card">
-      <div class="card-head blue">① 定價設定</div>
+      <div class="card-head blue">① 客戶與定價</div>
+      <div class="field">
+        <div class="field-info">
+          <div class="field-label">客戶姓名</div>
+          <div class="field-hint">選填，會顯示在摘要與紀錄</div>
+        </div>
+        <input type="text" id="custName" placeholder="例：王小姐" oninput="calc()">
+      </div>
       <div class="field">
         <div class="field-info">
           <div class="field-label">舊療程定價</div>
@@ -131,201 +172,331 @@ select{text-align:center;cursor:pointer;padding:8px 4px}
     </div>
   </div>
 
-  <!-- 右欄 -->
   <div>
     <div class="card">
       <div class="card-head blue">③ 新卡設定</div>
-
-      <!-- 新卡① -->
-      <div class="field">
-        <div class="field-info">
-          <div class="field-label">新卡①　<b>8折</b>　面額 20萬</div>
-          <div class="field-hint">殘額</div>
-        </div>
-        <input type="number" id="bal1" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
-      </div>
-      <div class="field sub">
-        <div class="field-info">
-          <div class="field-label" style="color:var(--muted);font-size:.85rem">新卡① 扣款順序</div>
-        </div>
-        <select id="order1" onchange="calc()">
-          <option value="1">第 1 扣</option>
-          <option value="2">第 2 扣</option>
-          <option value="3">第 3 扣</option>
-          <option value="9">不使用</option>
-        </select>
-      </div>
-      <div class="field-sep"></div>
-
-      <!-- 新卡② -->
-      <div class="field">
-        <div class="field-info">
-          <div class="field-label">新卡②　<b>75折</b>　面額 20萬</div>
-          <div class="field-hint">殘額</div>
-        </div>
-        <input type="number" id="bal2" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
-      </div>
-      <div class="field sub">
-        <div class="field-info">
-          <div class="field-label" style="color:var(--muted);font-size:.85rem">新卡② 扣款順序</div>
-        </div>
-        <select id="order2" onchange="calc()">
-          <option value="1">第 1 扣</option>
-          <option value="2" selected>第 2 扣</option>
-          <option value="3">第 3 扣</option>
-          <option value="9">不使用</option>
-        </select>
-      </div>
-      <div class="field-sep"></div>
-
-      <!-- 新卡③ -->
-      <div class="field">
-        <div class="field-info">
-          <div class="field-label">新卡③　<b>75折</b>　面額 30萬</div>
-          <div class="field-hint">殘額</div>
-        </div>
-        <input type="number" id="bal3" value="0" min="0" step="1000" inputmode="numeric" oninput="calc()">
-      </div>
-      <div class="field sub">
-        <div class="field-info">
-          <div class="field-label" style="color:var(--muted);font-size:.85rem">新卡③ 扣款順序</div>
-        </div>
-        <select id="order3" onchange="calc()">
-          <option value="1">第 1 扣</option>
-          <option value="2">第 2 扣</option>
-          <option value="3" selected>第 3 扣</option>
-          <option value="9">不使用</option>
-        </select>
-      </div>
+      <div id="cardInputs"></div>
     </div>
   </div>
 
-  <!-- 結算明細（全寬） -->
   <div class="card full-width">
     <div class="card-head green">④ 結算明細</div>
     <div id="breakdown"></div>
   </div>
+</div>
 
-</div><!-- /two-col -->
-
-<!-- 應收總額 -->
 <div class="total-box">
   <div class="total-lbl">現場應收金額</div>
   <div class="total-amt" id="totalAmt">$0</div>
   <div><span class="status-pill ok" id="statusPill">請輸入定價開始結算</span></div>
+  <div style="margin-top:12px">
+    <button class="btn primary" onclick="copySummary()">📋 複製摘要</button>
+    <button class="btn green" onclick="saveRecord()">💾 存入紀錄</button>
+    <button class="btn gray" onclick="resetAll()">🗑 清空重填</button>
+  </div>
 </div>
 
-<div class="note">黃底格 = 手動輸入 ｜ 計算結果即時更新</div>
+</div><!-- /page-calc -->
+
+<!-- ═══════════ 紀錄頁 ═══════════ -->
+<div class="page" id="page-records">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div style="font-size:.85rem;color:var(--muted)" id="recordCount"></div>
+    <button class="btn red small" onclick="clearRecords()">清除全部紀錄</button>
+  </div>
+  <div id="recordList"></div>
+</div>
+
+<!-- ═══════════ 卡片管理頁 ═══════════ -->
+<div class="page" id="page-settings">
+  <div class="card">
+    <div class="card-head gray">
+      <span>卡片種類設定</span>
+      <button class="btn small" style="background:rgba(255,255,255,.2);color:#fff" onclick="addCard()">＋ 新增卡片</button>
+    </div>
+    <div class="mgr-hint">修改後自動儲存，結算頁會即時同步。折扣填小數：8折=0.8、75折=0.75、85折=0.85</div>
+    <div id="cardMgrList"></div>
+  </div>
+  <div style="text-align:center">
+    <button class="btn gray" onclick="restoreDefaultCards()">還原預設四張卡</button>
+  </div>
+</div>
+
+<div class="note">💡 在手機瀏覽器點「分享」→「加入主畫面」，就能像 App 一樣使用</div>
+<div class="ver">v3.0 — 紀錄保存＋卡片管理版</div>
 
 <script>
 const $=id=>document.getElementById(id)
 const money=n=>'$'+Math.round(n).toLocaleString('zh-TW')
 const pct=n=>(n*100).toFixed(1)+'%'
 
-function calc(){
-  // 讀取輸入
-  const oldP  = +$('oldPrice').value||0
-  const newP  = +$('newPrice').value||0
-  const oldC  = +$('oldCard').value||0
-  const cash  = +$('cashPaid').value||0
-  const bal   = [+$('bal1').value||0, +$('bal2').value||0, +$('bal3').value||0]
-  const disc  = [0.8, 0.75, 0.75]
-  const order = [+$('order1').value, +$('order2').value, +$('order3').value]
-  const names = ['新卡①（8折）','新卡②（75折）','新卡③（75折）']
-  const discLabel = ['8折','75折','75折']
+// ═══════ 卡片設定（可自訂，存 localStorage）═══════
+const DEFAULT_CARDS=[
+  {name:'新卡①',face:'10萬',disc:0.85},
+  {name:'新卡②',face:'20萬',disc:0.80},
+  {name:'新卡③',face:'20萬',disc:0.75},
+  {name:'新卡④',face:'30萬',disc:0.75},
+]
+let CARDS=[]
+try{
+  CARDS=JSON.parse(localStorage.getItem('cards_v3'))||null
+}catch(e){CARDS=null}
+if(!Array.isArray(CARDS)||!CARDS.length)CARDS=JSON.parse(JSON.stringify(DEFAULT_CARDS))
 
-  // ── 核心計算（對應 Excel H61-H79）──
-  // H61: 舊卡實扣面額
-  const H61 = oldP>0 ? Math.min(oldC, oldP) : 0
-  // H62: 舊卡已付比例
-  const H62 = oldP>0 ? H61/oldP : 0
-  // H63: 剩餘比例
-  const H63 = 1-H62
-  // H64: 有無新卡
-  const H64 = bal.some((b,i)=>b>0&&order[i]!==9) ? 1 : 0
-  // H65: 新卡基準面額（ROUND）
-  let H65
-  if(oldC===0) H65 = newP
-  else if(H64===1) H65 = Math.round(H63*newP)
-  else H65 = Math.round(H63*oldP)
+function saveCards(){localStorage.setItem('cards_v3',JSON.stringify(CARDS))}
+function discLabel(d){const t=Math.round(d*100);return t%10===0?(t/10)+'折':t+'折'}
 
-  // 各卡面額上限
-  const ceil = bal.map((b,i)=>order[i]===9?0:(disc[i]>0?b/disc[i]:0))
-  // H66/H67/H68
-  const H66=ceil[0], H67=ceil[1], H68=ceil[2]
-
-  // rank 扣款
-  function rankCeil(r){ return order[0]===r?H66:order[1]===r?H67:order[2]===r?H68:0 }
-  const H69=rankCeil(1)
-  const H70=Math.min(H69, Math.max(H65,0))
-  const H71=Math.max(H65-H70,0)
-  const H72=rankCeil(2)
-  const H73=Math.min(H72,H71)
-  const H74=Math.max(H71-H73,0)
-  const H75=rankCeil(3)
-  const H76=Math.min(H75,H74)
-
-  // 各卡面額扣除
-  function cardFace(i){
-    if(order[i]===9) return 0
-    if(order[i]===1) return H70
-    if(order[i]===2) return H73
-    if(order[i]===3) return H76
-    return 0
-  }
-  const face=[cardFace(0),cardFace(1),cardFace(2)]
-  const actual=face.map((f,i)=>f*disc[i])
-
-  // 現場應收（對應 B27）
-  const due = Math.max(Math.round(H65-face[0]-face[1]-face[2])-cash, 0)
-
-  // ── 建明細 ──
-  const rows=[]
-
-  if(oldP>0||newP>0){
-    const track = oldC===0 ? '新定價' : H64===1 ? '舊卡剩餘比例 × 新定價' : '舊卡剩餘比例 × 舊定價'
-    rows.push({lbl:'應付基準金額', sub:track, val:money(H65), dim:false})
-  }
-
-  if(oldP>0){
-    if(H61>0)
-      rows.push({lbl:`舊卡抵扣（已付 ${pct(H62)}）`, sub:'', val:`-${money(H61)}`, dim:false})
-    else
-      rows.push({lbl:'舊卡抵扣', sub:'殘額為 0，未使用', val:'—', dim:true})
-  }
-
-  face.forEach((f,i)=>{
-    if(order[i]===9) return
-    if(bal[i]===0) return
-    if(f>0)
-      rows.push({lbl:`${names[i]} 扣除`, sub:`面額 ${money(f)} × ${discLabel[i]}`, val:`-${money(actual[i])}`, dim:false})
-    else
-      rows.push({lbl:names[i], sub:'前面卡已扣完，未觸及', val:'—', dim:true})
-  })
-
-  if(cash>0)
-    rows.push({lbl:'現場已付', sub:'現金或刷卡', val:`-${money(cash)}`, dim:false})
-
-  $('breakdown').innerHTML = rows.length
-    ? rows.map(r=>`
-      <div class="result-row">
-        <div class="result-lbl">${r.lbl}${r.sub?`<div class="result-sub">${r.sub}</div>`:''}</div>
-        <div class="result-val${r.dim?' dim':''}">${r.val}</div>
-      </div>`).join('')
-    : '<div class="result-row"><div class="result-lbl" style="color:#bbb">輸入定價後即顯示明細</div></div>'
-
-  // ── 總額與狀態 ──
-  const ta=$('totalAmt'), sp=$('statusPill')
-  ta.textContent = money(due)
-  if(!newP&&!oldP){
-    ta.className='total-amt'; sp.className='status-pill ok'; sp.textContent='請輸入定價開始結算'
-  } else if(due<=0){
-    ta.className='total-amt paid'; sp.className='status-pill ok'; sp.textContent='✓ 已全額付清，不需補款'
-  } else {
-    ta.className='total-amt'; sp.className='status-pill ng'; sp.textContent='❌ 請向客戶收取上方金額'
-  }
+// ═══════ 渲染結算頁的卡片輸入 ═══════
+let balVals={},orderVals={}
+function renderCardInputs(){
+  const container=$('cardInputs')
+  container.innerHTML=CARDS.map((c,i)=>`
+    ${i>0?'<div class="field-sep"></div>':''}
+    <div class="field">
+      <div class="field-info">
+        <div class="field-label">${c.name}　<b>${discLabel(c.disc)}</b>　面額 ${c.face}</div>
+        <div class="field-hint">殘額</div>
+      </div>
+      <input type="number" id="bal${i}" value="${balVals[i]||0}" min="0" step="1000" inputmode="numeric" oninput="calc()">
+    </div>
+    <div class="field sub">
+      <div class="field-info"><div class="field-label" style="color:var(--muted);font-size:.85rem">${c.name} 扣款順序</div></div>
+      <select id="order${i}" onchange="calc()">
+        ${CARDS.map((_,r)=>`<option value="${r+1}" ${(orderVals[i]||i+1)==r+1?'selected':''}>第 ${r+1} 扣</option>`).join('')}
+        <option value="9" ${(orderVals[i])==9?'selected':''}>不使用</option>
+      </select>
+    </div>
+  `).join('')
 }
 
+// ═══════ 核心計算 ═══════
+let lastResult=null
+function calc(){
+  const N=CARDS.length
+  const oldP=+$('oldPrice').value||0
+  const newP=+$('newPrice').value||0
+  const oldC=+$('oldCard').value||0
+  const cash=+$('cashPaid').value||0
+  const name=$('custName').value.trim()
+  const bal=CARDS.map((_,i)=>+($('bal'+i)?.value)||0)
+  const order=CARDS.map((_,i)=>+($('order'+i)?.value)||9)
+  balVals=Object.fromEntries(bal.map((b,i)=>[i,b]))
+  orderVals=Object.fromEntries(order.map((o,i)=>[i,o]))
+
+  // 重複順序防呆
+  const active=order.filter(o=>o!==9)
+  const dups=active.filter((o,i)=>active.indexOf(o)!==i)
+  CARDS.forEach((_,i)=>{
+    const sel=$('order'+i)
+    if(sel)sel.className=(order[i]!==9&&dups.includes(order[i]))?'dup':''
+  })
+  const wb=$('warnBar')
+  if(dups.length){wb.textContent='⚠ 扣款順序重複了！請調整後再看結果。';wb.classList.add('show')}
+  else wb.classList.remove('show')
+
+  // 計算
+  const oldDeduct=oldP>0?Math.min(oldC,oldP):0
+  const oldRatio=oldP>0?oldDeduct/oldP:0
+  const remRatio=1-oldRatio
+  const hasNewCard=bal.some((b,i)=>b>0&&order[i]!==9)
+  let base
+  if(oldC===0)base=newP
+  else if(hasNewCard)base=Math.round(remRatio*newP)
+  else base=Math.round(remRatio*oldP)
+
+  const ceil=bal.map((b,i)=>order[i]===9?0:(CARDS[i].disc>0?b/CARDS[i].disc:0))
+  const face=CARDS.map(_=>0)
+  let remaining=Math.max(base,0)
+  for(let rank=1;rank<=N;rank++){
+    const idx=order.indexOf(rank)
+    if(idx===-1)continue
+    const take=Math.min(ceil[idx],remaining)
+    face[idx]=take
+    remaining=Math.max(remaining-take,0)
+  }
+  const actual=face.map((f,i)=>f*CARDS[i].disc)
+  const cardRemain=bal.map((b,i)=>Math.max(b-actual[i],0))
+  const totalFace=face.reduce((a,b)=>a+b,0)
+  const due=Math.max(Math.round(base-totalFace)-cash,0)
+
+  // 明細
+  const rows=[]
+  if(oldP>0||newP>0){
+    const track=oldC===0?'新定價':hasNewCard?'舊卡剩餘比例 × 新定價':'舊卡剩餘比例 × 舊定價'
+    rows.push({lbl:'應付基準金額',sub:track,val:money(base),dim:false})
+  }
+  if(oldP>0){
+    if(oldDeduct>0)rows.push({lbl:`舊卡抵扣（已付 ${pct(oldRatio)}）`,sub:oldC>oldDeduct?`舊卡尚餘 ${money(oldC-oldDeduct)}`:'舊卡已用完',val:`-${money(oldDeduct)}`,dim:false})
+    else rows.push({lbl:'舊卡抵扣',sub:'殘額為 0，未使用',val:'—',dim:true})
+  }
+  face.forEach((f,i)=>{
+    if(order[i]===9||bal[i]===0)return
+    if(f>0)rows.push({lbl:`${CARDS[i].name}（${discLabel(CARDS[i].disc)}）扣除`,sub:`面額 ${money(f)} × ${discLabel(CARDS[i].disc)}，卡片尚餘 ${money(cardRemain[i])}`,val:`-${money(actual[i])}`,dim:false})
+    else rows.push({lbl:CARDS[i].name,sub:'前面卡已扣完，未觸及',val:'—',dim:true})
+  })
+  if(cash>0)rows.push({lbl:'現場已付',sub:'現金或刷卡',val:`-${money(cash)}`,dim:false})
+
+  $('breakdown').innerHTML=rows.length
+    ?rows.map(r=>`<div class="result-row"><div class="result-lbl">${r.lbl}${r.sub?`<div class="result-sub">${r.sub}</div>`:''}</div><div class="result-val${r.dim?' dim':''}">${r.val}</div></div>`).join('')
+    :'<div class="result-row"><div class="result-lbl" style="color:#bbb">輸入定價後即顯示明細</div></div>'
+
+  const ta=$('totalAmt'),sp=$('statusPill')
+  ta.textContent=money(due)
+  if(!newP&&!oldP){ta.className='total-amt';sp.className='status-pill ok';sp.textContent='請輸入定價開始結算'}
+  else if(due<=0){ta.className='total-amt paid';sp.className='status-pill ok';sp.textContent='✓ 已全額付清，不需補款'}
+  else{ta.className='total-amt';sp.className='status-pill ng';sp.textContent='❌ 請向客戶收取上方金額'}
+
+  lastResult={name,oldP,newP,oldC,cash,base,oldDeduct,oldRatio,face,actual,cardRemain,due,order,bal,
+    cardSnapshot:CARDS.map(c=>({...c}))}
+}
+
+// ═══════ 摘要文字 ═══════
+function summaryText(r){
+  const lines=['【療程結算摘要】']
+  if(r.name)lines.push(`客戶：${r.name}`)
+  if(r.oldP>0)lines.push(`舊定價 ${money(r.oldP)}`)
+  if(r.newP>0)lines.push(`新定價 ${money(r.newP)}`)
+  lines.push(`應付基準 ${money(r.base)}`)
+  if(r.oldDeduct>0)lines.push(`舊卡抵扣 -${money(r.oldDeduct)}（已付 ${pct(r.oldRatio)}）`)
+  r.face.forEach((f,i)=>{
+    if(f>0){
+      const c=r.cardSnapshot[i]
+      lines.push(`${c.name}（${discLabel(c.disc)}）-${money(r.actual[i])}（卡片尚餘 ${money(r.cardRemain[i])}）`)
+    }
+  })
+  if(r.cash>0)lines.push(`現場已付 -${money(r.cash)}`)
+  lines.push('─────────')
+  lines.push(r.due<=0?'✅ 已全額付清':`❗現場應收 ${money(r.due)}`)
+  return lines.join('\n')
+}
+
+function copySummary(){
+  if(!lastResult)return
+  const text=summaryText(lastResult)
+  navigator.clipboard.writeText(text).then(()=>{
+    alert('✓ 已複製，可直接貼到 Line')
+  }).catch(()=>{prompt('請手動複製：',text)})
+}
+
+// ═══════ 紀錄保存 ═══════
+function getRecords(){
+  try{return JSON.parse(localStorage.getItem('records_v3'))||[]}catch(e){return[]}
+}
+function saveRecord(){
+  if(!lastResult||( !lastResult.oldP && !lastResult.newP )){alert('請先輸入定價再存紀錄');return}
+  const recs=getRecords()
+  recs.unshift({
+    ts:Date.now(),
+    name:lastResult.name||'（未填姓名）',
+    due:lastResult.due,
+    text:summaryText(lastResult)
+  })
+  if(recs.length>200)recs.length=200  // 最多保留200筆
+  localStorage.setItem('records_v3',JSON.stringify(recs))
+  alert('✓ 已存入紀錄')
+  renderRecords()
+}
+function renderRecords(){
+  const recs=getRecords()
+  $('recordCount').textContent=`共 ${recs.length} 筆（存在此裝置）`
+  $('recordList').innerHTML=recs.length
+    ?recs.map((r,i)=>{
+      const d=new Date(r.ts)
+      const time=`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+      return `<div class="record" id="rec${i}">
+        <div class="record-top" onclick="document.getElementById('rec${i}').classList.toggle('open')">
+          <div>
+            <div class="record-name">${r.name}</div>
+            <div class="record-time">${time}</div>
+          </div>
+          <div class="record-due ${r.due<=0?'paid':'owe'}">${r.due<=0?'✓ 付清':'應收 '+money(r.due)}</div>
+        </div>
+        <div class="record-detail">${r.text}</div>
+        <div class="record-actions">
+          <button class="btn primary small" onclick="event.stopPropagation();copyRecord(${i})">複製</button>
+          <button class="btn red small" onclick="event.stopPropagation();delRecord(${i})">刪除</button>
+        </div>
+      </div>`
+    }).join('')
+    :'<div class="empty-msg">還沒有紀錄<br>在結算頁按「存入紀錄」即可保存</div>'
+}
+function copyRecord(i){
+  const recs=getRecords()
+  navigator.clipboard.writeText(recs[i].text).then(()=>alert('✓ 已複製')).catch(()=>prompt('請手動複製：',recs[i].text))
+}
+function delRecord(i){
+  if(!confirm('刪除這筆紀錄？'))return
+  const recs=getRecords();recs.splice(i,1)
+  localStorage.setItem('records_v3',JSON.stringify(recs))
+  renderRecords()
+}
+function clearRecords(){
+  if(!confirm('確定清除全部紀錄？此動作無法復原'))return
+  localStorage.removeItem('records_v3')
+  renderRecords()
+}
+
+// ═══════ 卡片管理 ═══════
+function renderCardMgr(){
+  $('cardMgrList').innerHTML=CARDS.map((c,i)=>`
+    <div class="cardmgr-item">
+      <div><span class="cardmgr-lbl">卡片名稱</span><input type="text" value="${c.name}" onchange="updCard(${i},'name',this.value)"></div>
+      <div><span class="cardmgr-lbl">面額標示</span><input type="text" value="${c.face}" onchange="updCard(${i},'face',this.value)" style="width:80px"></div>
+      <div><span class="cardmgr-lbl">折扣(小數)</span><input type="number" value="${c.disc}" step="0.01" min="0.01" max="1" onchange="updCard(${i},'disc',this.value)"></div>
+      <button class="btn red small" onclick="delCard(${i})" style="margin-left:auto">刪除</button>
+    </div>
+  `).join('')
+}
+function updCard(i,key,val){
+  if(key==='disc'){
+    val=parseFloat(val)
+    if(!(val>0&&val<=1)){alert('折扣需介於 0.01～1 之間（例如 8折填 0.8）');renderCardMgr();return}
+  }
+  CARDS[i][key]=val
+  saveCards();renderCardInputs();renderCardMgr();calc()
+}
+function addCard(){
+  CARDS.push({name:'新卡'+(CARDS.length+1),face:'10萬',disc:0.8})
+  saveCards();renderCardInputs();renderCardMgr();calc()
+}
+function delCard(i){
+  if(CARDS.length<=1){alert('至少要保留一張卡');return}
+  if(!confirm(`刪除「${CARDS[i].name}」？`))return
+  CARDS.splice(i,1)
+  balVals={};orderVals={}
+  saveCards();renderCardInputs();renderCardMgr();calc()
+}
+function restoreDefaultCards(){
+  if(!confirm('還原成預設四張卡？自訂的卡片會被清掉'))return
+  CARDS=JSON.parse(JSON.stringify(DEFAULT_CARDS))
+  balVals={};orderVals={}
+  saveCards();renderCardInputs();renderCardMgr();calc()
+}
+
+// ═══════ 頁面切換 ═══════
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'))
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'))
+  $('page-'+p).classList.add('active')
+  $('tab-'+p).classList.add('active')
+  if(p==='records')renderRecords()
+}
+
+function resetAll(){
+  if(!confirm('確定要清空所有輸入嗎？'))return
+  ;['oldPrice','newPrice','oldCard','cashPaid'].forEach(id=>$(id).value=0)
+  $('custName').value=''
+  CARDS.forEach((_,i)=>{
+    if($('bal'+i))$('bal'+i).value=0
+    if($('order'+i))$('order'+i).value=i+1
+  })
+  balVals={};orderVals={}
+  calc()
+}
+
+// 初始化
+renderCardInputs()
+renderCardMgr()
 calc()
 </script>
 </body>
